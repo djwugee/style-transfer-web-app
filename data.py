@@ -2,9 +2,9 @@ import os
 
 # Style Models Data
 
-style_models_file = ['candy.t7', 'composition_vii.t7', 'feathers.t7', 'la_muse.t7', 'mosaic.t7', 'starry_night.t7', 'the_scream.t7', 'the_wave.t7', 'udnie.t7', 'triangle_style_4000.t7', 'triangle_style_1000.t7' ]
+style_models_file = ['candy.t7', 'composition_vii.t7', 'feathers.t7', 'la_muse.t7', 'mosaic.t7', 'starry_night_2500.t7', 'the_scream.t7', 'the_wave.t7', 'udnie.t7', 'triangle_style_4000.t7', 'triangle_style_1000.t7', 'rain_style_iter_4000.t7', 'pink_style_2000.t7', 'Fire_Style_22000_Iterations.t7', 'landscape_style_11600.t7', 'gold_black_4000_5000' ]
 
-style_models_name = ['Candy', 'Composition_vii', 'Feathers', 'La_muse', 'Mosaic', 'Starry_night', 'The_scream', 'The_wave', 'Udnie', 'Tapatoru1', 'Tapatoru2'  ]
+style_models_name = ['Candy', 'Composition_vii', 'Feathers', 'La_muse', 'Mosaic', 'Starry_night', 'The_scream', 'The_wave', 'Udnie', 'Tapatoru', 'TapatoruRua', 'Ua', 'MaWhero', 'TeAhiKa', 'Papatuanuku', 'Koura'   ]
 
 model_path = 'models'
 
