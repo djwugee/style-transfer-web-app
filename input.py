@@ -14,7 +14,7 @@ def image_input(style_model_name):
     model = get_model_from_path(style_model_path)
 
     if st.sidebar.checkbox('Upload'):
-        content_file = st.sidebar.file_uploader("Choose a Content Image", type=["png", "jpg", "jpeg"])
+        content_file = st.sidebar.file_uploader("Choose a Content Image", type=["png", "jpg", "jpeg", "mp4", "webm"])
     else:
         content_name = st.sidebar.selectbox("Choose the content images:", content_images_name)
         content_file = content_images_dict[content_name]
