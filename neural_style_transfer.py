@@ -4,8 +4,12 @@ import numpy as np
 import logging
 
 def get_model_from_path(style_model_path):
-    model = cv2.dnn.readNetFromTorch(style_model_path)
-    return model
+    try:
+        model = cv2.dnn.readNetFromTorch(style_model_path)
+        return model
+    except Exception as e:
+        logging.error(f"An error occurred while loading the style model: {str(e)}")
+        return None
 
 def style_transfer(image, model):
     try:
