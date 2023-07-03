@@ -29,7 +29,9 @@ class NeuralStyleTransferTransformer(VideoTransformerBase):
             self._update_model()
 
     def _update_model(self):
-        style_model_path = style_models_dict[self._model_name]
+        style_model_path = style_models_dict.get(self._model_name)
+        if style_model_path is None:
+            raise ValueError(f"Invalid style model name: {self._model_name}")
         with self._model_lock:
             self._model = get_model_from_path(style_model_path)
 
@@ -47,13 +49,15 @@ class NeuralStyleTransferTransformer(VideoTransformerBase):
 video_file = st.sidebar.file_uploader("Choose a Video File", type=["mp4", "webm"])
 if video_file is not None:
     st.video(video_file)
-    style_model_path = style_models_dict[style_model_name]
+    style_model_path = style_models_dict.get(style_model_name)
+    if style_model_path is None:
+        raise ValueError(f"Invalid style model name: {style_model_name}")
     model = get_model_from_path(style_model_path)
     if st.sidebar.checkbox('Upload'):
         content_file = st.sidebar.file_uploader("Choose a Content Image", type=["png", "jpg", "jpeg"])
     else:
         content_name = st.sidebar.selectbox("Choose the content images:", content_images_name)
-        content_file = content_images_dict[content_name]
+        content_file = content_images_dict.get(content_name)
     if content_file is not None:
         content = Image.open(content_file)
         content = np.array(content)
