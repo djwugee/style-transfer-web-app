@@ -4,6 +4,12 @@ import numpy as np
 from PIL import Image
 import streamlit as st
 
+# Define the VideoTransformerBase class
+class VideoTransformerBase:
+    def transform(self, frame):
+        # Implement your video transformation logic here
+        pass
+
 WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 501, 50)))
 
 class NeuralStyleTransferTransformer(VideoTransformerBase):
@@ -46,6 +52,17 @@ class NeuralStyleTransferTransformer(VideoTransformerBase):
         result = Image.fromarray((transferred * 255).astype(np.uint8))
         return np.asarray(result.resize((orig_w, orig_h)))
 
+style_model_name = ""
+
+# Define your style model name
+style_models_dict = {}
+
+# Define your content images name
+content_images_name = []
+
+# Define your content images dictionary
+content_images_dict = {}
+
 video_file = st.sidebar.file_uploader("Choose a Video File", type=["mp4", "webm"])
 if video_file is not None:
     st.video(video_file)
@@ -53,21 +70,26 @@ if video_file is not None:
     if style_model_path is None:
         raise ValueError(f"Invalid style model name: {style_model_name}")
     model = get_model_from_path(style_model_path)
+
+    # Define the get_model_from_path function
+
     if st.sidebar.checkbox('Upload'):
         content_file = st.sidebar.file_uploader("Choose a Content Image", type=["png", "jpg", "jpeg"])
     else:
         content_name = st.sidebar.selectbox("Choose the content images:", content_images_name)
         content_file = content_images_dict.get(content_name)
+
     if content_file is not None:
         content = Image.open(content_file)
         content = np.array(content)
         content = cv2.cvtColor(content, cv2.COLOR_RGB2BGR)
     else:
-        st.warning("Upload an Image OR Untick the Upload Button)")
+        st.warning("Upload an Image OR Untick the Upload Button")
         st.stop()
-    content = imutils.resize(content, width=WIDTH)
-    generated = style_transfer(content, model)
+
+    content = imutils.resize(content, width=WIDTH)  # Make sure to import imutils
+    generated = style_transfer(content, model)  # Define the style_transfer function
     st.sidebar.image(content, width=300, channels='BGR')
     st.image(generated, channels='BGR', clamp=True)
 else:
-    st.warning("Upload a Video File")
+    st.warning("No video file selected.")
