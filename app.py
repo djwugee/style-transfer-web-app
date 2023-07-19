@@ -12,7 +12,7 @@ style_model_name = st.sidebar.selectbox("Choose the style model: ", style_models
 
 if method == 'Image':
     image_input(style_model_name)
-else method == 'Webcam':
+elif method == 'Webcam':
     webcam_input(style_model_name)
-else: method == 'Video':
+elif method == 'Video':
     video_input(style_model_name)
