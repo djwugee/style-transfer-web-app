@@ -39,7 +39,7 @@ def image_input(style_model_name):
 
 def webcam_input(style_model_name):
     st.header("Webcam Live Feed")
-    WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 501, 50)))
+    WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 701, 50)))
     width = WIDTH
 
     @st_session_memo
