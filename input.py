@@ -1,12 +1,15 @@
-import threading
 import numpy as np
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, ClientSettings
+from streamlit_webrtc import webrtc_streamer
 from PIL import Image
 import cv2
 import imutils
 from neural_style_transfer import get_model_from_path, style_transfer
 from data import *
+
+import av
+from turn import get_ice_servers
+from streamlit_session_memo import st_session_memo
 
 def image_input(style_model_name):
     style_model_path = style_models_dict[style_model_name]
@@ -37,76 +40,34 @@ def image_input(style_model_name):
 def webcam_input(style_model_name):
     st.header("Webcam Live Feed")
     WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 501, 50)))
+    width = WIDTH
 
-    class NeuralStyleTransferTransformer(VideoTransformerBase):
-        _width = WIDTH
-        _model_name = style_model_name
-        _model = None
+    @st_session_memo
+    def load_model(model_name, width):  # `width` is not used when loading the model, but is necessary as a cache key.
+        return get_model_from_path(model_name)
 
-        def __init__(self) -> None:
-            self._model_lock = threading.Lock()
+    model = load_model(style_models_dict[style_model_name], width)
 
-            self._width = WIDTH
-            self._update_model()
+    def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
+        image = frame.to_ndarray(format="bgr24")
 
-        def set_width(self, width):
-            update_needed = self._width != width
-            self._width = width
-            if update_needed:
-                self._update_model()
+        if model is None:
+            return image
 
-        def update_model_name(self, model_name):
-            update_needed = self._model_name != model_name
-            self._model_name = model_name
-            if update_needed:
-                self._update_model()
+        orig_h, orig_w = image.shape[0:2]
 
-        def _update_model(self):
-            style_model_path = style_models_dict[self._model_name]
-            with self._model_lock:
-                self._model = get_model_from_path(style_model_path)
+        # cv2.resize used in a forked thread may cause memory leaks
+        input = np.asarray(Image.fromarray(image).resize((width, int(width * orig_h / orig_w))))
 
-        def transform(self, frame):
-            image = frame.to_ndarray(format="bgr24")
+        transferred = style_transfer(input, model)
 
-            if self._model == None:
-                return image
-
-            orig_h, orig_w = image.shape[0:2]
-
-            # cv2.resize used in a forked thread may cause memory leaks
-            input = np.asarray(Image.fromarray(image).resize((self._width, int(self._width * orig_h / orig_w))))
-
-            with self._model_lock:
-                transferred = style_transfer(input, self._model)
-
-            result = Image.fromarray((transferred * 255).astype(np.uint8))
-            return np.asarray(result.resize((orig_w, orig_h)))
+        result = Image.fromarray((transferred * 255).astype(np.uint8))
+        image = np.asarray(result.resize((orig_w, orig_h)))
+        return av.VideoFrame.from_ndarray(image, format="bgr24")
 
     ctx = webrtc_streamer(
-        client_settings=ClientSettings(
-            rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-            media_stream_constraints={"video": True, "audio": False},
-        ),
-        video_transformer_factory=NeuralStyleTransferTransformer,
         key="neural-style-transfer",
+        video_frame_callback=video_frame_callback,
+        rtc_configuration={"iceServers": get_ice_servers()},
+        media_stream_constraints={"video": True, "audio": False},
     )
-    if ctx.video_transformer:
-        ctx.video_transformer.set_width(WIDTH)
-        ctx.video_transformer.update_model_name(style_model_name)
-def video_input(style_model_name):
-    style_model_path = style_models_dict[style_model_name]
-    model = get_model_from_path(style_model_path)
-
-    if st.sidebar.checkbox('Upload'):
-        video_file = st.sidebar.file_uploader("Choose a Video File", type=["mp4", "webm"])
-    else:
-        video_name = st.sidebar.selectbox("Choose the video:", video_files_name)
-        video_file = video_files_dict[video_name]
-
-    if video_file is not None:
-        video = cv2.VideoCapture(video_file)
-        fps = video.get(cv2.CAP_PROP_FPS)
-    else:
-        st.warning("Upload a Video OR Untick the Upload Button")
-        st.stop()
