@@ -30,7 +30,7 @@ def image_input(style_model_name):
         st.warning("Upload an Image OR Untick the Upload Button)")
         st.stop()
 
-    WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 501, 50)), value=400)
+    WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 801, 50)), value=400)
     content = imutils.resize(content, width=WIDTH)
     generated = style_transfer(content, model)
     st.sidebar.image(content, width=300, channels='BGR')
