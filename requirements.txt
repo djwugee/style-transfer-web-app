@@ -6,3 +6,4 @@ opencv-python-headless==4.6.0.66
 streamlit-webrtc~=0.45.0
 twilio~=8.1.0
 streamlit-session-memo~=0.3.1
+aiohttp>=3.10.11 # not directly required, pinned by Snyk to avoid a vulnerability
