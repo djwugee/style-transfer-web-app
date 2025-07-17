@@ -1,9 +1,9 @@
 imutils==0.5.3
 numpy
 streamlit
-#//Pillow==8.3.0
+Pillow==10.4.0
 opencv-python
-streamlit-webrtc~=0.47.0
-twilio~=8.1.0
+streamlit-webrtc==0.47.3
+twilio==7.17.0
 streamlit-session-memo~=0.3.1
 tornado>=6.4.2 # not directly required, pinned by Snyk to avoid a vulnerability
