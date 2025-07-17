@@ -65,9 +65,12 @@ def webcam_input(style_model_name):
         image = np.asarray(result.resize((orig_w, orig_h)))
         return av.VideoFrame.from_ndarray(image, format="bgr24")
 
+    ice_servers = get_ice_servers()
+    st.write(f"ICE servers: {ice_servers}")  # For debugging 
+    
     ctx = webrtc_streamer(
         key="neural-style-transfer",
         video_frame_callback=video_frame_callback,
-        rtc_configuration={"iceServers": get_ice_servers()},
+        rtc_configuration={"iceServers": ice_servers},
         media_stream_constraints={"video": True, "audio": False},
     )
