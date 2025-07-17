@@ -8,6 +8,7 @@ from neural_style_transfer import get_model_from_path, style_transfer
 from data import *
 
 import av
+import asyncio
 from turn import get_ice_servers
 from streamlit_session_memo import st_session_memo
 
@@ -50,6 +51,9 @@ def webcam_input(style_model_name):
 
     def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
         image = frame.to_ndarray(format="bgr24")
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
         if model is None:
             return image
