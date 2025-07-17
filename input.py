@@ -38,34 +38,24 @@ def image_input(style_model_name):
 
 
 def webcam_input(style_model_name):
-    st.header("Webcam Live Feed")
-    WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 701, 50)))
-    width = WIDTH
-
-    @st_session_memo
-    def load_model(model_name, width):  # `width` is not used when loading the model, but is necessary as a cache key.
-        return get_model_from_path(model_name)
-
-    model = load_model(style_models_dict[style_model_name], width)
+    style_model_path = style_models_dict[style_model_name]
+    model = get_model_from_path(style_model_path)
 
     def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
         image = frame.to_ndarray(format="bgr24")
-
-        if model is None:
-            return image
-
         orig_h, orig_w = image.shape[0:2]
-
-        # cv2.resize used in a forked thread may cause memory leaks
+        
+        width = 400
         input = np.asarray(Image.fromarray(image).resize((width, int(width * orig_h / orig_w))))
-
+        
         transferred = style_transfer(input, model)
 
         result = Image.fromarray((transferred * 255).astype(np.uint8))
         image = np.asarray(result.resize((orig_w, orig_h)))
+
         return av.VideoFrame.from_ndarray(image, format="bgr24")
 
-    ctx = webrtc_streamer(
+    webrtc_streamer(
         key="neural-style-transfer",
         video_frame_callback=video_frame_callback,
         rtc_configuration={"iceServers": get_ice_servers()},
