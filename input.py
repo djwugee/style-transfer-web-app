@@ -10,7 +10,7 @@ from data import *
 import av
 import asyncio
 from turn import get_ice_servers
-from streamlit_session_memo import st_session_memo
+# from streamlit_session_memo import st_session_memo
 
 def image_input(style_model_name):
     style_model_path = style_models_dict[style_model_name]
@@ -43,7 +43,7 @@ def webcam_input(style_model_name):
     WIDTH = st.sidebar.select_slider('QUALITY (May reduce the speed)', list(range(150, 701, 50)))
     width = WIDTH
 
-    @st_session_memo
+    @st.cache_resource
     def load_model(model_name, width):  # `width` is not used when loading the model, but is necessary as a cache key.
         return get_model_from_path(model_name)
 
@@ -51,9 +51,6 @@ def webcam_input(style_model_name):
 
     def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
         image = frame.to_ndarray(format="bgr24")
-        
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
 
         if model is None:
             return image

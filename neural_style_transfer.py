@@ -21,5 +21,5 @@ def style_transfer(image, model):
     output /= 255.0
     output = output.transpose(1, 2, 0)
     output = np.clip(output, 0.0, 1.0)
-    output = imutils.resize(output, width=1000)
+    output = imutils.resize(output, width=w)
     return output
