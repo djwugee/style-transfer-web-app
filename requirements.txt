@@ -1,8 +1,8 @@
 imutils==0.5.3
 numpy
 streamlit
-Pillow==10.4.0
-opencv-python
+Pillow>=11.0.0,<12.0.0
+opencv-python-headless
 streamlit-webrtc==0.47.3
 twilio==7.17.0
 # streamlit-session-memo~=0.3.1
